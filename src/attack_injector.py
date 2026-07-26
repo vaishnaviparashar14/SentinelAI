@@ -19,7 +19,7 @@ print(f"Loaded {len(df)} events.")
 
 def inject_brute_force(df):
 
-    NUM_ATTACK_USERS = 15
+    NUM_ATTACK_USERS = 40  # Increased from 15
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -54,7 +54,7 @@ def inject_brute_force(df):
 
 def inject_impossible_travel(df):
 
-    NUM_IMPOSSIBLE_USERS = 10
+    NUM_IMPOSSIBLE_USERS = 30  # Increased from 10
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -81,10 +81,9 @@ def inject_impossible_travel(df):
         df.loc[first_idx, "geo_location"] = country1
         df.loc[second_idx, "geo_location"] = country2
 
-        df.loc[first_idx, "risk_score"] = random.randint(80, 88)
-        df.loc[second_idx, "risk_score"] = random.randint(90, 98)
-
-       
+        # More aggressive risk scores for clearer signal
+        df.loc[first_idx, "risk_score"] = 95  # Increased from 80-88
+        df.loc[second_idx, "risk_score"] = 100  # Increased from 90-98
 
         df.loc[first_idx, "label"] = "Impossible Travel"
         df.loc[second_idx, "label"] = "Impossible Travel"
@@ -92,9 +91,10 @@ def inject_impossible_travel(df):
     print("Impossible Travel attacks injected successfully!")
     return df
 
+
 def inject_device_spoofing(df):
 
-    NUM_DEVICE_USERS = 10
+    NUM_DEVICE_USERS = 30  # Increased from 10
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -130,9 +130,10 @@ def inject_device_spoofing(df):
 
     return df
 
+
 def inject_credential_stuffing(df):
 
-    NUM_EVENTS = 25
+    NUM_EVENTS = 120  # Increased from 25
 
     attack_indices = random.sample(
         list(df.index),
@@ -144,7 +145,24 @@ def inject_credential_stuffing(df):
     for i, idx in enumerate(attack_indices):
 
         df.loc[idx, "source_ip"] = attacker_ip
-        df.loc[idx, "risk_score"] = random.randint(90, 99)
+        df.loc[idx, "risk_score"] = random.randint(92, 100)  # Increased range
+        
+        # Add more realistic features for credential stuffing
+        df.loc[idx, "device_fingerprint"] = (
+            "BOT-" +
+            "".join(random.choices(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+                k=8
+            ))
+        )
+        
+        df.loc[idx, "geo_location"] = random.choice([
+            "Russia",
+            "China",
+            "Brazil",
+            "Germany"
+        ])
+        
         df.loc[idx, "label"] = "Credential Stuffing"
 
         if i < NUM_EVENTS - 1:
@@ -156,14 +174,23 @@ def inject_credential_stuffing(df):
 
     return df
 
+
+# Run all injections
 df = inject_brute_force(df)
 df = inject_impossible_travel(df)
 df = inject_device_spoofing(df)
 df = inject_credential_stuffing(df)
 
+# Save the dataset
 df.to_csv(
     "data/processed/cybersecurity_dataset.csv",
     index=False
 )
 
 print("Cybersecurity dataset saved successfully!")
+
+# Print summary of injected attacks
+print("\n=== Attack Injection Summary ===")
+print(f"Total records: {len(df)}")
+print(f"Attack distribution:")
+print(df["label"].value_counts())

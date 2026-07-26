@@ -236,5 +236,5 @@ st.divider()
 # RECENT EVENTS
 # ==========================================================
 
-st.error("APP IS CALLING COMPONENTS")
+
 components.show_threat_feed(filtered_df)
