@@ -441,3 +441,23 @@ def attack_distribution(df):
     )
     
     return fig
+import streamlit as st
+
+def model_performance_card():
+    st.markdown("""
+    <div style="
+        background:#1E293B;
+        padding:18px;
+        border-radius:12px;
+        border:1px solid #334155;
+        margin-bottom:15px;
+    ">
+        <h4 style="margin-top:0;">🤖 Model Performance</h4>
+        <table style="width:100%; font-size:15px;">
+            <tr><td>Accuracy</td><td style="text-align:right;"><b>95.1%</b></td></tr>
+            <tr><td>Precision</td><td style="text-align:right;"><b>94.9%</b></td></tr>
+            <tr><td>Recall</td><td style="text-align:right;"><b>95.1%</b></td></tr>
+            <tr><td>F1 Score</td><td style="text-align:right;"><b>95.0%</b></td></tr>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)

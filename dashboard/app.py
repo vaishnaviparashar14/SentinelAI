@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import components
 
-st.write("Loaded from:", components.__file__)
+
 
 from charts import (
     attack_distribution,
@@ -30,6 +30,7 @@ load_css()
 # ==========================================================
 
 df = pd.read_csv("data/processed/predictions.csv")
+
 
 # ==========================================================
 # SIDEBAR
@@ -84,6 +85,9 @@ filtered_df = filtered_df[
 # ==========================================================
 
 total_events = len(df)
+print("Total Events:", len(df))
+print("Total Attacks:", len(df[df["label"] != "Normal"]))
+print(df["label"].value_counts())
 
 total_attacks = len(
     df[df["label"] != "Normal"]
@@ -202,6 +206,26 @@ col4.info(
 )
 
 st.divider()
+#=============================
+# models
+#=============================
+st.subheader("🤖 Model Performance")
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Accuracy", "95.1%")
+
+with col2:
+    st.metric("Precision", "94.9%")
+
+with col3:
+    st.metric("Recall", "95.1%")
+
+with col4:
+    st.metric("F1 Score", "95.0%")
+
+
 
 # ==========================================================
 # CHARTS

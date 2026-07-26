@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+from datetime import timedelta
 
 COUNTRIES = [
     "India",
@@ -19,7 +20,7 @@ print(f"Loaded {len(df)} events.")
 
 def inject_brute_force(df):
 
-    NUM_ATTACK_USERS = 40  # Increased from 15
+    NUM_ATTACK_USERS = 40
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -39,14 +40,18 @@ def inject_brute_force(df):
 
         for idx in attack_indices[:-1]:
             df.loc[idx, "login_status"] = "Failed"
-            df.loc[idx, "risk_score"] = random.randint(90, 100)
+            df.loc[idx, "risk_score"] = random.randint(88, 95)  # Updated range
             df.loc[idx, "label"] = "Brute Force"
+            df.loc[idx, "resource_accessed"] = "Admin Portal"
+            df.loc[idx, "auth_method"] = "Password"
 
         final_idx = attack_indices[-1]
 
         df.loc[final_idx, "login_status"] = "Success"
-        df.loc[final_idx, "risk_score"] = random.randint(94, 100)
+        df.loc[final_idx, "risk_score"] = random.randint(88, 95)  # Updated range
         df.loc[final_idx, "label"] = "Brute Force"
+        df.loc[final_idx, "resource_accessed"] = "Admin Portal"
+        df.loc[final_idx, "auth_method"] = "Password"
 
     print("Brute Force attacks injected successfully!")
     return df
@@ -54,7 +59,7 @@ def inject_brute_force(df):
 
 def inject_impossible_travel(df):
 
-    NUM_IMPOSSIBLE_USERS = 30  # Increased from 10
+    NUM_IMPOSSIBLE_USERS = 30
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -78,15 +83,41 @@ def inject_impossible_travel(df):
             [c for c in COUNTRIES if c != country1]
         )
 
+        # First event
         df.loc[first_idx, "geo_location"] = country1
-        df.loc[second_idx, "geo_location"] = country2
-
-        # More aggressive risk scores for clearer signal
-        df.loc[first_idx, "risk_score"] = 95  # Increased from 80-88
-        df.loc[second_idx, "risk_score"] = 100  # Increased from 90-98
-
+        df.loc[first_idx, "risk_score"] = random.randint(80, 92)  # Updated range
         df.loc[first_idx, "label"] = "Impossible Travel"
+        df.loc[first_idx, "login_status"] = "Success"
+
+        # Second event - change everything
+        df.loc[second_idx, "geo_location"] = country2
+        df.loc[second_idx, "risk_score"] = random.randint(80, 92)  # Updated range
         df.loc[second_idx, "label"] = "Impossible Travel"
+        df.loc[second_idx, "login_status"] = "Success"
+        
+        # Change IP for second event
+        df.loc[second_idx, "source_ip"] = ".".join(
+            str(random.randint(1, 255))
+            for _ in range(4)
+        )
+        
+        # Change device for second event
+        df.loc[second_idx, "device_fingerprint"] = (
+            "UNKNOWN-" +
+            "".join(
+                random.choices(
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+                    k=8
+                )
+            )
+        )
+        
+        # Change timestamp to 2-10 minutes later
+        first_time = pd.to_datetime(df.loc[first_idx, "timestamp"])
+        df.loc[second_idx, "timestamp"] = (
+            first_time +
+            timedelta(minutes=random.randint(2, 10))
+        )
 
     print("Impossible Travel attacks injected successfully!")
     return df
@@ -94,7 +125,7 @@ def inject_impossible_travel(df):
 
 def inject_device_spoofing(df):
 
-    NUM_DEVICE_USERS = 30  # Increased from 10
+    NUM_DEVICE_USERS = 30
 
     selected_users = random.sample(
         list(df["entity_id"].unique()),
@@ -123,8 +154,9 @@ def inject_device_spoofing(df):
             )
 
             df.loc[idx, "device_fingerprint"] = fake_device
-            df.loc[idx, "risk_score"] = random.randint(70, 90)
+            df.loc[idx, "risk_score"] = random.randint(75, 88)  # Updated range
             df.loc[idx, "label"] = "Device Spoofing"
+            df.loc[idx, "login_status"] = "Success"  # Added success status
 
     print("Device Spoofing attacks injected successfully!")
 
@@ -133,7 +165,7 @@ def inject_device_spoofing(df):
 
 def inject_credential_stuffing(df):
 
-    NUM_EVENTS = 120  # Increased from 25
+    NUM_EVENTS = 120
 
     attack_indices = random.sample(
         list(df.index),
@@ -145,7 +177,7 @@ def inject_credential_stuffing(df):
     for i, idx in enumerate(attack_indices):
 
         df.loc[idx, "source_ip"] = attacker_ip
-        df.loc[idx, "risk_score"] = random.randint(92, 100)  # Increased range
+        df.loc[idx, "risk_score"] = random.randint(92, 100)  # Kept high range
         
         # Add more realistic features for credential stuffing
         df.loc[idx, "device_fingerprint"] = (
@@ -164,6 +196,10 @@ def inject_credential_stuffing(df):
         ])
         
         df.loc[idx, "label"] = "Credential Stuffing"
+        
+        # Add resource and auth method
+        df.loc[idx, "resource_accessed"] = "Login API"
+        df.loc[idx, "auth_method"] = "Password"
 
         if i < NUM_EVENTS - 1:
             df.loc[idx, "login_status"] = "Failed"
