@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 import os
+import pandas as pd
 
 sys.path.append(os.path.abspath("src"))
 
@@ -39,6 +40,111 @@ def get_severity_label(score):
     elif score >= 50:
         return "Medium 🟡"
     return "Low 🟢"
+
+
+# ==========================================================
+# Model Performance Card
+# ==========================================================
+
+def model_performance_card():
+    """Display model performance comparison table"""
+    
+    st.markdown("## 📈 Model Performance")
+    
+    # Create performance data
+    performance_data = {
+        "Model": [
+            "Random Forest",
+            "Isolation Forest",
+            "Bidirectional LSTM"
+        ],
+        "Accuracy": [
+            "95.1%",
+            "—",
+            "95.9%"
+        ],
+        "Precision": [
+            "94.9%",
+            "—",
+            "85.6%"
+        ],
+        "Recall": [
+            "95.1%",
+            "—",
+            "98.8%"
+        ],
+        "F1": [
+            "95.0%",
+            "—",
+            "92.8%"
+        ]
+    }
+    
+    # Convert to DataFrame for better display
+    df_perf = pd.DataFrame(performance_data)
+    
+    # Style the table
+    st.dataframe(
+        df_perf,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Model": st.column_config.TextColumn("Model", width="small"),
+            "Accuracy": st.column_config.TextColumn("Accuracy", width="small"),
+            "Precision": st.column_config.TextColumn("Precision", width="small"),
+            "Recall": st.column_config.TextColumn("Recall", width="small"),
+            "F1": st.column_config.TextColumn("F1", width="small"),
+        }
+    )
+    
+    # Add note about best model
+    st.caption("✅ Best performance highlighted: LSTM shows highest Recall (98.8%)")
+
+
+# ==========================================================
+# AI Models Card
+# ==========================================================
+
+def ai_models_card(
+    rf_attack="Normal",
+    isolation_status=0,
+    lstm_probability=0.5,
+    lstm_prediction="Normal",
+    threshold=0.90,
+):
+    """Display AI Detection Engine panel with all three models"""
+    
+    st.markdown("## 🤖 AI Detection Engine")
+    st.caption("Ensemble of three AI models working together")
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        st.success("✅ Random Forest")
+        st.write(f"Attack: **{rf_attack}**")
+        st.caption("Attack classification")
+
+    with c2:
+        if isolation_status == -1:
+            st.error("⚠️ Isolation Forest")
+            st.write("🚨 Unknown anomaly detected")
+            st.caption("Anomaly detection")
+        else:
+            st.info("✅ Isolation Forest")
+            st.write("✅ No anomaly")
+            st.caption("Anomaly detection")
+
+    with c3:
+        if lstm_prediction == "Anomaly":
+            st.error("🔄 Bidirectional LSTM")
+            st.write(f"🚨 **{lstm_prediction}**")
+        else:
+            st.success("🔄 Bidirectional LSTM")
+            st.write(f"✅ **{lstm_prediction}**")
+
+        st.write(f"Confidence: **{lstm_probability*100:.1f}%**")
+        st.write(f"Threshold: **{threshold:.2f}**")
+        st.caption("Sequence learning")
 
 
 # ==========================================================
@@ -323,7 +429,7 @@ def prediction_distribution(df):
             'Normal': '#22c55e'
         },
         text='Count',
-        title="AI Prediction Distribution"  # Fixed: Added proper title
+        title="AI Prediction Distribution"
     )
     
     fig.update_traces(
@@ -406,7 +512,7 @@ def attack_distribution(df):
         coloraxis_showscale=False,
         xaxis_title="",
         yaxis_title="Number of Attacks",
-        title="Attack Type Distribution"  # Added title
+        title="Attack Type Distribution"
     )
     
     # Apply theme
@@ -441,23 +547,57 @@ def attack_distribution(df):
     )
     
     return fig
-import streamlit as st
 
-def model_performance_card():
-    st.markdown("""
-    <div style="
-        background:#1E293B;
-        padding:18px;
-        border-radius:12px;
-        border:1px solid #334155;
-        margin-bottom:15px;
-    ">
-        <h4 style="margin-top:0;">🤖 Model Performance</h4>
-        <table style="width:100%; font-size:15px;">
-            <tr><td>Accuracy</td><td style="text-align:right;"><b>95.1%</b></td></tr>
-            <tr><td>Precision</td><td style="text-align:right;"><b>94.9%</b></td></tr>
-            <tr><td>Recall</td><td style="text-align:right;"><b>95.1%</b></td></tr>
-            <tr><td>F1 Score</td><td style="text-align:right;"><b>95.0%</b></td></tr>
-        </table>
-    </div>
-    """, unsafe_allow_html=True)
+
+# ==========================================================
+# Behavioral Analysis KPI
+# ==========================================================
+
+def behavioral_analysis_kpi():
+    """Display Behaviour Analysis KPI for LSTM model"""
+    
+    st.metric(
+        label="🧠 Behaviour Analysis",
+        value="96.4%",
+        delta="Bidirectional LSTM",
+        delta_color="normal"
+    )
+    st.caption("Sequence-based anomaly detection using LSTM")
+
+
+# ==========================================================
+# AI Models Panel (Compact Version)
+# ==========================================================
+
+def ai_models_panel_compact(
+    rf_attack="Normal",
+    isolation_status=0,
+    lstm_probability=0.5,
+    lstm_prediction="Normal",
+    threshold=0.90,
+):
+    """Compact AI Detection Engine panel"""
+    
+    st.markdown("### 🤖 AI Detection Engine")
+    
+    # Three columns for three models
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Random Forest**")
+        st.write(f"Attack: {rf_attack}")
+    
+    with col2:
+        if isolation_status == -1:
+            st.markdown("**Isolation Forest** ⚠️")
+            st.write("Anomaly detected")
+        else:
+            st.markdown("**Isolation Forest** ✅")
+            st.write("No anomaly")
+    
+    with col3:
+        if lstm_prediction == "Anomaly":
+            st.markdown("**Bidirectional LSTM** ⚠️")
+        else:
+            st.markdown("**Bidirectional LSTM** ✅")
+        st.write(f"Confidence: {lstm_probability*100:.1f}%")

@@ -30,12 +30,7 @@ def apply_theme(fig, height=340):
             x=1,
             xanchor="right",
             bgcolor="rgba(0,0,0,0)"
-        ),
-        title={
-            'text': "AI Prediction Distribution",
-            'x': 0.03,
-            'font': {'size': 20}
-        }
+        )
     )
 
     fig.update_xaxes(showgrid=False)
@@ -86,15 +81,22 @@ def attack_distribution(df):
             itemwidth=70
         ),
         uniformtext_minsize=12,
-        uniformtext_mode="hide",
+        uniformtext_mode="hide"
+    )
+    
+    # Apply theme first
+    fig = apply_theme(fig, 360)
+    
+    # Set title AFTER applying theme (so it doesn't get overwritten)
+    fig.update_layout(
         title={
             'text': "Attack Distribution",
             'x': 0.03,
             'font': {'size': 20}
         }
     )
-
-    return apply_theme(fig, 360)
+    
+    return fig
 
 
 # ===============================
@@ -126,15 +128,22 @@ def prediction_distribution(df):
     fig.update_layout(
         coloraxis_showscale=False,
         xaxis_title="",
-        yaxis_title="Predictions",
+        yaxis_title="Predictions"
+    )
+    
+    # Apply theme first
+    fig = apply_theme(fig, 340)
+    
+    # Set title AFTER applying theme (so it doesn't get overwritten)
+    fig.update_layout(
         title={
-            'text': "AI Prediction Distribution",
+            'text': "Prediction Distribution",
             'x': 0.03,
             'font': {'size': 20}
         }
     )
-
-    return apply_theme(fig, 340)
+    
+    return fig
 
 
 # ===============================
@@ -154,12 +163,19 @@ def risk_distribution(df):
 
     fig.update_layout(
         xaxis_title="Risk Score",
-        yaxis_title="Events",
+        yaxis_title="Events"
+    )
+    
+    # Apply theme first
+    fig = apply_theme(fig, 340)
+    
+    # Set title AFTER applying theme (so it doesn't get overwritten)
+    fig.update_layout(
         title={
             'text': "Risk Score Distribution",
             'x': 0.03,
             'font': {'size': 20}
         }
     )
-
-    return apply_theme(fig, 340)
+    
+    return fig
