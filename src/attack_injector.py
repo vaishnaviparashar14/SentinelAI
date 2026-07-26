@@ -45,7 +45,7 @@ def inject_brute_force(df):
         final_idx = attack_indices[-1]
 
         df.loc[final_idx, "login_status"] = "Success"
-        df.loc[final_idx, "risk_score"] = 95
+        df.loc[final_idx, "risk_score"] = random.randint(94, 100)
         df.loc[final_idx, "label"] = "Brute Force"
 
     print("Brute Force attacks injected successfully!")
@@ -81,8 +81,10 @@ def inject_impossible_travel(df):
         df.loc[first_idx, "geo_location"] = country1
         df.loc[second_idx, "geo_location"] = country2
 
-        df.loc[first_idx, "risk_score"] = 88
-        df.loc[second_idx, "risk_score"] = 98
+        df.loc[first_idx, "risk_score"] = random.randint(80, 88)
+        df.loc[second_idx, "risk_score"] = random.randint(90, 98)
+
+       
 
         df.loc[first_idx, "label"] = "Impossible Travel"
         df.loc[second_idx, "label"] = "Impossible Travel"
@@ -121,7 +123,7 @@ def inject_device_spoofing(df):
             )
 
             df.loc[idx, "device_fingerprint"] = fake_device
-            df.loc[idx, "risk_score"] = 92
+            df.loc[idx, "risk_score"] = random.randint(70, 90)
             df.loc[idx, "label"] = "Device Spoofing"
 
     print("Device Spoofing attacks injected successfully!")

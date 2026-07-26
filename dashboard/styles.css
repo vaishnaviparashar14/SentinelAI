@@ -1,0 +1,38 @@
+/* Main App */
+.stApp {
+    background-color: #0E1117;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #161B22;
+}
+
+/* Metric Cards */
+div[data-testid="metric-container"] {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+/* Metric Labels */
+div[data-testid="metric-container"] label {
+    font-size: 16px;
+}
+
+/* Metric Values */
+div[data-testid="metric-container"] div {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Tables */
+div[data-testid="stDataFrame"] {
+    border-radius: 12px;
+}
+
+/* Buttons */
+.stButton>button {
+    border-radius: 10px;
+}

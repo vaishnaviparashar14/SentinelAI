@@ -1,11 +1,15 @@
 import streamlit as st
 import pandas as pd
+import components
+
+st.write("Loaded from:", components.__file__)
 
 from charts import (
     attack_distribution,
     prediction_distribution,
     risk_distribution
 )
+
 
 # ==========================================================
 # PAGE CONFIG
@@ -16,7 +20,11 @@ st.set_page_config(
     page_icon="🛡️",
     layout="wide"
 )
+def load_css():
+    with open("dashboard/styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+load_css()
 # ==========================================================
 # LOAD DATA
 # ==========================================================
@@ -133,6 +141,67 @@ with col4:
     )
 
 st.divider()
+# ==========================================================
+# SECURITY OVERVIEW
+# ==========================================================
+
+st.subheader("🛡 Security Overview")
+
+col1, col2, col3, col4 = st.columns(4)
+
+active_threats = len(
+    df[df["prediction"] == "Anomaly"]
+)
+
+critical_threats = len(
+    df[
+        (df["prediction"] == "Anomaly")
+        &
+        (df["risk_score"] >= 90)
+    ]
+)
+
+detection_rate = round(
+    (
+        (df["prediction"] == df["is_attack"]).sum()
+        / len(df)
+    ) * 100,
+    2
+)
+
+system_status = (
+    "🟢 Healthy"
+    if critical_threats < 50
+    else "🔴 Critical"
+)
+
+col1.success(system_status)
+
+col2.warning(
+    f"""
+### 🚨 Active Threats
+
+{active_threats}
+"""
+)
+
+col3.error(
+    f"""
+### 🔥 Critical Threats
+
+{critical_threats}
+"""
+)
+
+col4.info(
+    f"""
+### 🤖 Detection Rate
+
+{detection_rate}%
+"""
+)
+
+st.divider()
 
 # ==========================================================
 # CHARTS
@@ -167,13 +236,5 @@ st.divider()
 # RECENT EVENTS
 # ==========================================================
 
-st.subheader("🚨 Recent Security Events")
-
-st.dataframe(
-    filtered_df.sort_values(
-        by="risk_score",
-        ascending=False
-    ),
-    use_container_width=True,
-    height=450
-)
+st.error("APP IS CALLING COMPONENTS")
+components.show_threat_feed(filtered_df)
